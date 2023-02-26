@@ -1,18 +1,21 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include "weighted_dict.h"
 #include "dict.h"
 #include "tstring.h"
 
-void allocate_weighted_dict(weighted_dict *in, int n) {
+void allocate_and_fill_weighted_dict(weighted_dict *in, int n) {
     int i;
-    in->weights = malloc(sizeof(int) * n);
-    in->dicts = malloc(sizeof(dict) * n);
+    in->weights = calloc(n, sizeof(int));
+    in->dicts = calloc(n, sizeof(dict));
     in->allocated = n;
-    for(i=0; i<in->allocated; i++)
+    in->len = n;
+    for(i=0; i<n; i++) {
         allocate_dict(&in->dicts[i], 1);
+        push_dict_key(&in->dicts[i], i);
+    }
 }
 
+/* Unused
 void double_weighted_dict(weighted_dict *in) {
     int i;
     in->allocated *= 2;
@@ -20,8 +23,9 @@ void double_weighted_dict(weighted_dict *in) {
     in->dicts = realloc(in->dicts, sizeof(dict) * in->allocated);
     for(i=in->len; i<in->allocated; i++)
         allocate_dict(&in->dicts[i], 1);
-}
+}*/
 
+/* legacy
 void push_weighted_dict(weighted_dict *in, int key) {
     if(in->len == in->allocated)
         double_weighted_dict(in);
@@ -40,11 +44,22 @@ void add_count(weighted_dict *in, int key) {
         }
     if(i==in->len)
         push_weighted_dict(in, key);
+}*/
+
+void fill_weighted_dict(weighted_dict *in) { /* used solely in this project, DO NOT USE OUTSIDE, unused*/
+    int i;
+    for(i=0; i<in->allocated; i++)
+        push_dict_key(&in->dicts[i], i);
+    in->len = in->allocated;
+}
+
+void add_count(weighted_dict *in, int key) { /*might not be used*/
+    in->weights[key]++;
 }
 
 void move_value(weighted_dict *in, int start) {
     int i;
-    free(in->dicts[start + 1].keys);
+    /*free(in->dicts[start + 1].keys);*/
     for(i=start + 2; i<in->len; i++) {
         if(in->weights[start] > in->weights[i]) {
             in->weights[i-1] = in->weights[i];
@@ -56,9 +71,9 @@ void move_value(weighted_dict *in, int start) {
     in->dicts[i-1] = in->dicts[start];
 }
 
-void merge_on_start(weighted_dict *in, int start) {
+void merge_weighted_dict_on_start(weighted_dict *in, int start) {
     in->weights[start] += in->weights[start+1];
-    merge(&in->dicts[start], &in->dicts[start+1]);
+    merge_dict(&in->dicts[start], &in->dicts[start+1]);
 }
 
 void sort_weighted_dict(weighted_dict *in) {
@@ -82,7 +97,7 @@ void sort_weighted_dict(weighted_dict *in) {
     }
 }
 
-void free_weighted_dict(weighted_dict *in) {
+void free_weighted_dict(weighted_dict *in) { /*unused*/
     int i;
     free(in->weights);
     for(i=0; i<in->len; i++)

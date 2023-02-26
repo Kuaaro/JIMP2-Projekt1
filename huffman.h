@@ -3,6 +3,6 @@
 
 #include "weighted_dict.h"
 
-void huffman(weighted_dict *in);
+void huffman_on_start(weighted_dict *in, int start);
 
 #endif
