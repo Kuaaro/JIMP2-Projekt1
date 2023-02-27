@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
     }
 
     /*checks if file exists*/
-    if((f_in = fopen("test.txt", "rb")) == NULL) {
+    if((f_in = fopen(argv[1], "rb")) == NULL) {
         printf("%s: file '%s' not found\n", argv[0], argv[1]);
         return 1;
     }
