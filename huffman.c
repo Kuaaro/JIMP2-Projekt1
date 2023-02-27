@@ -1,7 +1,7 @@
 #include "weighted_dict.h"
 #include "dict.h"
 
-void huffman_on_start(weighted_dict *in, int start) {
+void huffman_on_start(weighted_dict *in, int start) { /*Creates dict containing keys with huffman at last position of weighted dict*/
     int i;
     for(i=start; i<in->len-1; i++) {
         append_char_all(&in->dicts[i], '0');

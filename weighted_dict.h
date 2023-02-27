@@ -11,17 +11,24 @@ typedef struct {
     int allocated;
 } weighted_dict;
 
-void allocate_and_fill_weighted_dict(weighted_dict *in, int n);
+void allocate_and_fill_weighted_dict(weighted_dict *in, int n); /*Allocates and fills weighted_dict with default values*/
 
-void fill_weighted_dict(weighted_dict *in); /*unused*/
+/*
+legacy
 
-void add_count(weighted_dict *in, int key);
+void double_weighted_dict(weighted_dict *in);
 
-void move_value(weighted_dict *in, int start);
+void push_weighted_dict(weighted_dict *in, int key);
 
-void merge_weighted_dict_on_start(weighted_dict *in, int start);
+void fill_weighted_dict(weighted_dict *in); unused
+*/
+void add_count(weighted_dict *in, int key); /*nice wrap to adding one count*/
 
-void sort_weighted_dict(weighted_dict *in);
+void move_value(weighted_dict *in, int start); /*Sorts in value after change*/
 
-void free_weighted_dict(weighted_dict *in); /*unused*/
+void merge_weighted_dict_on_start(weighted_dict *in, int start); /*merges dict[start+1] to dict[start]*/
+
+void sort_weighted_dict(weighted_dict *in); /*Sorts weighted dict by weights*/
+
+/*void free_weighted_dict(weighted_dict *in); unused*/
 #endif

@@ -3,6 +3,6 @@
 
 #include "weighted_dict.h"
 
-void huffman_on_start(weighted_dict *in, int start);
+void huffman_on_start(weighted_dict *in, int start); /*Creates dict containing keys with huffman at last position of weighted dict*/
 
 #endif

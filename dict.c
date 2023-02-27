@@ -4,7 +4,7 @@
 
 /* Checked, no shown errors, correct output, valgrind is angry, don't know why'*/
 
-void allocate_dict(dict *in, int n) {
+void allocate_dict(dict *in, int n) { /*Allocates dict*/
     int i;
     in->keys = calloc(n, sizeof(int));
     in->values = calloc(n, sizeof(tstring));
@@ -13,7 +13,7 @@ void allocate_dict(dict *in, int n) {
     in->allocated = n;
 }
 
-void double_size_dict(dict *in) {
+void double_size_dict(dict *in) { /*Doubles dict size*/
     int i;
     in->allocated *= 2;
     in->keys = realloc(in->keys, sizeof(int) * in->allocated);
@@ -28,7 +28,7 @@ void double_size_dict(dict *in) {
         tidy_str(&in->values[i]);
 }*/
 
-void push_dict_key(dict *in, int key) {
+void push_dict_key(dict *in, int key) { /*Adds key to dict*/
     if(in->len == in->allocated)
         double_size_dict(in);
     in->keys[in->len] = key;
@@ -36,13 +36,13 @@ void push_dict_key(dict *in, int key) {
     in->len++;
 }
 
-void append_char_all(dict *in, char c) {
+void append_char_all(dict *in, char c) { /*Appends char to all values of dict*/
     int i;
     for(i=0; i<in->len; i++)
         push_str(&in->values[i], c);
 }
 
-void merge_dict(dict *in1, dict *in2) {
+void merge_dict(dict *in1, dict *in2) { /*adds keys and values of in2 to in1 and frees unused keys in in1 and in2*/
     int i;
     for(i=0; i<in2->len; i++) {
         push_dict_key(in1, in2->keys[i]);
@@ -63,7 +63,7 @@ void merge_dict(dict *in1, dict *in2) {
     return NULL;
 }*/
 
-void free_dict(dict *in) {
+void free_dict(dict *in) { /*frees dict*/
     int i;
     for(i=0; i<in->allocated; i++)
         free_str(&in->values[i]);
