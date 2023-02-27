@@ -6,19 +6,35 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main() {
+int main(int argc, char **argv) {
     FILE *f_in, *f_out;
     int i, j, k;
     weighted_dict wd;
-    tstring temp, *hash_map;
+    tstring temp, temp2, *hash_map;
 
+    if(argc==1) {
+        printf("%s: file name not given\n", argv[0]);
+        return 1;
+    }
+
+    if((f_in = fopen(argv[1], "rb")) == NULL) {
+        printf("%s: file '%s' not found\n", argv[0], argv[1]);
+        return 1;
+    }
     allocate_and_fill_weighted_dict(&wd, 256);
-
-    f_in = fopen("test.txt", "rb");
-    f_out = fopen("out.huff", "wb");
-
-    while((i = getc(f_in)) != EOF)
+    
+    j=0;
+    while((i = getc(f_in)) != EOF) {
         add_count(&wd, i);
+        j++;
+    }
+
+    if(j==0) {
+        printf("%s: file '%s' is empty\n", argv[0], argv[1]);
+        free_weighted_dict(&wd);
+        fclose(f_in);
+        return 1;
+    }
     rewind(f_in);
 
     sort_weighted_dict(&wd);
@@ -41,34 +57,38 @@ int main() {
         printf("key: %c, value: %s\n", wd.dicts[255].keys[i], wd.dicts[255].values[i].text);
     }
     
-    allocate_str(&temp, j + 7);
+    allocate_str(&temp, (j > 8 ? j : 8) + 7);
+    allocate_str(&temp2, 8);
+
+    f_out = fopen("out.huff", "wb");
+
+    for(i=0; i<256; i++) {
+        j = hash_map[i].len;
+        for(k=0; k<8; k++) {
+            push_str(&temp2, j%2 + '0');
+            j /= 2;
+        }
+        strrev(&temp2);
+        merge_str(&temp, &temp2);
+        pull_str(&temp2, 8);
+        write_str(f_out, &temp);
+        if(hash_map[i].len) {
+            merge_str(&temp, &hash_map[i]);
+            write_str(f_out, &temp);
+        }
+    }
+
+    free_str(&temp2);
 
     while((i = getc(f_in)) != EOF) {
         merge_str(&temp, &hash_map[i]);
-        while(temp.len>=8) {
-            j = 0;
-            k = 1;
-            for(i=7; i>=0; i--) {
-                j += (temp.text[i] - 48) * k;
-                k *= 2;
-            }
-            fwrite(&j, sizeof(char), 1, f_out);
-            printf("%s %c\n", temp.text, j);
-            pull_str(&temp, 8);
-        }
+        write_str(f_out, &temp);
     }
 
     push_str(&temp, '1');
     for(i=0; i<8-temp.len; i++)
         push_str(&temp, '0');
-    j = 0;
-    k = 1;
-    for(i=7; i>=0; i--) {
-        j += (temp.text[i] - 48) * k;
-        k *= 2;
-    }
-    fwrite(&j, sizeof(char), 1, f_out);
-    printf("%s %c\n", temp.text, j);
+    write_str(f_out, &temp);
 
     free_dict(&wd.dicts[255]);
     free(wd.dicts);

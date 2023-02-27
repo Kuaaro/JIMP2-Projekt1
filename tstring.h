@@ -2,6 +2,7 @@
 #define TSTRING_H
 
 #include <stdlib.h>
+#include <stdio.h>
 
 typedef struct {
     char *text;
@@ -22,6 +23,8 @@ void pull_str(tstring *in, int n);
 void strrev(tstring *in);
 
 void merge_str(tstring *in1, tstring *in2);
+
+void write_str(FILE *f_out, tstring *in);
 
 void free_str(tstring *in);
 

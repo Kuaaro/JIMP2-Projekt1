@@ -1,5 +1,6 @@
 #include "tstring.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 /*All checked - no leaks*/
 
@@ -51,6 +52,24 @@ void merge_str(tstring *in1, tstring *in2) {
     for(i=0; i<in2->len; i++)
         push_str(in1, in2->text[i]);
     /*free_str(in2);*/
+}
+
+void write_str(FILE *f_out, tstring *in) {
+    int i, j, k;
+    char c[8];
+    while(in->len>=8) {
+            j = 0;
+            k = 1;
+            for(i=7; i>=0; i--) {
+                j += (in->text[i] - 48) * k;
+                k *= 2;
+                c[i] = in->text[i];
+            }
+            fwrite(&j, sizeof(char), 1, f_out);
+            printf("%s\n", c);
+            pull_str(in, 8);
+        }
+
 }
 
 void free_str(tstring *in) {
