@@ -1,31 +1,26 @@
 #ifndef TSTRING_H
 #define TSTRING_H
 
-#include <stdlib.h>
 #include <stdio.h>
 
 typedef struct {
+    int len, alloc;
     char *text;
-    int len;
-    int allocated;
-} tstring;
+} String;
 
-void allocate_str(tstring *in, int n); /*Allocates string*/
+void allocateString(String *in, int n);
 
-void double_size_str(tstring *in); /*Doubles size of string*/
+void doubleStringSize(String *in);
 
-/*void tidy_str(tstring *in); Unused*/
+void pushString(String *in, char c);
 
-void push_str(tstring *in, char a); /*Adds char on end, double_size if too small*/
+void pullString(String *in, int n);
 
-void pull_str(tstring *in, int n); /*Takes n first characters from string*/
+void reverseString(String *in);
 
-void strrev(tstring *in); /*Reverses string*/
+void mergeString(String *in, String *out);
 
-void merge_str(tstring *in1, tstring *in2); /*Adds content of secound string to first*/
+void writeOut(FILE *f, String *in);
 
-void write_str(FILE *f_out, tstring *in); /*writes 8 bits from in to f_out*/
-
-void free_str(tstring *in); /*frees string*/
-
+void freeString(String *in);
 #endif
