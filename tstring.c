@@ -1,83 +1,64 @@
 #include "tstring.h"
-#include <stdlib.h>
+
 #include <stdio.h>
+#include <stdlib.h>
 
-/*All checked - no leaks*/
-
-void allocate_str(tstring *in, int n) { /*Allocates string*/
+/*allocate String with n spaces for chars*/
+void allocateString(String *in, int n) {
     in->text = calloc(n, sizeof(char));
-    in->allocated = n;
+    in->alloc = n;
+    in->len = 0;
 }
 
-void double_size_str(tstring *in) { /*Doubles size of string*/
-    in->allocated *= 2;
-    in->text = realloc(in->text, sizeof(char) * in->allocated);
+/*double allocation of String*/
+void doubleStringSize(String *in) {
+    in->alloc *= 2;
+    in->text = realloc(in->text, sizeof(char) * in->alloc);
 }
 
-/*void tidy_str(tstring *in) { Unused
-    int i;
-    for(i=in->len; i<in->allocated; i++)
-        in->text[i] = 0;
-}*/
-
-void push_str(tstring *in, char a) { /*Adds char on end, double_size if too small*/
-    if(in->len == in->allocated)
-        double_size_str(in);
-    in->text[in->len] = a;
-    in->len++;
+/*pushes char at the end of String*/
+void pushString(String *in, char c) {
+    if(in->len==in->alloc)
+        doubleStringSize(in);
+    in->text[in->len++] = c;
 }
 
-void pull_str(tstring *in, int n) { /*Takes n first characters from string*/
+/*removes n first characters of String*/
+void pullString(String *in, int n) {
     int i;
     for(i=n; i<in->len; i++)
         in->text[i-n] = in->text[i];
     in->len -= n;
 }
 
-void strrev(tstring *in) { /*Reverses string*/
-    int i, j;
-    char a;
-
-    j = in->len-1;
-    for(i=0; i<in->len/2; i++) {
-        a = in->text[i];
-        in->text[i] = in->text[j];
-        in->text[j] = a;
-        j--;
+/*reverses String*/
+void reverseString(String *in) {
+    int i;
+    char c;
+    for(i=0; i<in->len; i++) {
+        c = in->text[i];
+        in->text[i] = in->text[in->len - i];
+        in->text[in->len - 1] = c;
     }
 }
 
-void merge_str(tstring *in1, tstring *in2) { /*Adds content of secound string to first*/
+/*merges String in to String out*/
+void mergeString(String *in, String *out) {
     int i;
-    for(i=0; i<in2->len; i++)
-        push_str(in1, in2->text[i]);
-    /*free_str(in2);*/
+    for(i=0; i<in->len; i++)
+        pushString(out, in->text[i]);
 }
 
-void write_str(FILE *f_out, tstring *in) { /*writes 8 bits from in to f_out*/
-    int i, j, k;
-    #ifdef DEBUG
-    char c[8];
-    #endif
+/*writes String to file in binary*/
+void writeOut(FILE *f, String *in) {
+    int i;
     while(in->len>=8) {
-            j = 0;
-            k = 1;
-            for(i=7; i>=0; i--) {
-                j += (in->text[i] - 48) * k;
-                k *= 2;
-                #ifdef DEBUG
-                c[i] = in->text[i];
-                #endif
-            }
-            fwrite(&j, sizeof(char), 1, f_out);
-            #ifdef DEBUG
-            printf("%s\n", c);
-            #endif
-            pull_str(in, 8);
-        }
-
+        i = (in->text[0] - 48) * 128 + (in->text[1] - 48) * 64 + (in->text[2] - 48) * 32 + (in->text[3] - 48) * 16 + (in->text[4] - 48) * 8 + (in->text[5] - 48) * 4 + (in->text[6] - 48) * 2 + (in->text[7] - 48);
+        fwrite(&i, sizeof(char), 1, f);
+        pullString(in, 8);
+    }
 }
 
-void free_str(tstring *in) { /*frees string*/
+void freeString(String *in) {
     free(in->text);
 }
